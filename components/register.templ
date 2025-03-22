@@ -1,0 +1,28 @@
+package components
+
+import "go-htmx/components/shared"
+
+templ Register(errorMessage ...string) {
+	@shared.Page("Register") {
+		<body>
+			<h1>Register</h1>
+			if len(errorMessage) > 0 {
+				<p style="color: red;">{ errorMessage[0] }</p>
+			}
+			<form method="post" action="/register">
+				<label for="username">Username:</label>
+				<br/>
+				<input type="text" id="username" name="username"/>
+				<br/>
+				<br/>
+				<label for="password">Password:</label>
+				<br/>
+				<input type="password" id="password" name="password"/>
+				<br/>
+				<br/>
+				<input type="submit" value="Submit"/>
+			</form>
+			<a href="/login">Login</a>
+		</body>
+	}
+}
