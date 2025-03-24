@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"go-htmx/components"
 	"go-htmx/database"
 	"log"
@@ -92,26 +91,16 @@ func start_server(ctx context.Context, wg *sync.WaitGroup) {
 	app.Use(logger.New())
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		c.Set("Content-Type", "text/html")
 		sess, err := store.Get(c)
 		if err != nil {
-			return err
+			// Empty error handler - this should be handled
+			return err // Add this line
 		}
 		sessionID := sess.Get("session_id")
-		if sessionID == nil {
-			return c.SendString("Not logged in. <a href='/login'>Login</a> <a href='/register'>Register</a>")
+		if sessionID != nil {
+			return render(c, components.Home(sessionID.(string)))
 		}
-		sessionInfo, err := queries.GetSession(c.Context(), sessionID.(string))
-		if err != nil {
-			return c.SendString("Session error. <a href='/login'>Login</a> <a href='/register'>Register</a>")
-		}
-
-		user, err := queries.GetUser(c.Context(), sessionInfo.UserID)
-		if err != nil {
-			return c.SendString("User error. <a href='/login'>Login</a> <a href='/register'>Register</a>")
-		}
-
-		return c.SendString(fmt.Sprintf("Logged in as %s. <a href='/logout'>Logout</a>", user.Username))
+		return render(c, components.Home(""))
 	})
 
 	app.Get("/login", func(c *fiber.Ctx) error {
@@ -124,6 +113,14 @@ func start_server(ctx context.Context, wg *sync.WaitGroup) {
 			Password string `form:"password"`
 		}
 
+		start := time.Now()
+		defer func() {
+			elapsed := time.Since(start)
+			if elapsed < 3*time.Second {
+				time.Sleep(3*time.Second - elapsed)
+			}
+		}()
+
 		var input LoginInput
 		if err := c.BodyParser(&input); err != nil {
 			return err
@@ -131,7 +128,7 @@ func start_server(ctx context.Context, wg *sync.WaitGroup) {
 
 		user, err := queries.GetUserByUsername(c.Context(), input.Username)
 		if err != nil {
-			return render(c, components.Login(withError("Invalid username or password"+err.Error())))
+			return render(c, components.Login(withError("Invalid username or password")))
 		}
 
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
@@ -149,7 +146,7 @@ func start_server(ctx context.Context, wg *sync.WaitGroup) {
 			return err
 		}
 
-		expiresAt := time.Now().Add(24 * time.Hour).Unix()
+		expiresAt := time.Now().Add(5 * time.Minute).Unix()
 		_, err = queries.CreateSession(c.Context(), database.CreateSessionParams{
 			SessionID: sessionID,
 			UserID:    user.ID,
@@ -194,7 +191,7 @@ func start_server(ctx context.Context, wg *sync.WaitGroup) {
 		return c.Redirect("/login")
 	})
 
-	app.Get("/logout", func(c *fiber.Ctx) error {
+	app.Post("/logout", func(c *fiber.Ctx) error {
 		sess, err := store.Get(c)
 		if err != nil {
 			return err

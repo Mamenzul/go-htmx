@@ -1,0 +1,41 @@
+package components
+
+import "go-htmx/components/shared"
+
+templ Home(sessionID string) {
+	@shared.Page("Home") {
+		<main class="container">
+			<h1>Home</h1>
+			if sessionID != "" {
+				<div class="welcome-section">
+					<p>Welcome back! Your session ID is: <span class="session-id">{ sessionID }</span></p>
+					<button
+						hx-post="/logout"
+						hx-confirm="Are you sure you want to logout?"
+						hx-target="body"
+					>
+						Logout
+					</button>
+				</div>
+			} else {
+				<div class="auth-section">
+					<p>Welcome to the home page!</p>
+					<nav class="auth-links">
+						<button
+							hx-get="/register"
+							hx-target="body"
+						>
+							Register
+						</button>
+						<button
+							hx-get="/login"
+							hx-target="body"
+						>
+							Login
+						</button>
+					</nav>
+				</div>
+			}
+		</main>
+	}
+}

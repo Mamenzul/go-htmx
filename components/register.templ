@@ -4,25 +4,19 @@ import "go-htmx/components/shared"
 
 templ Register(errorMessage ...string) {
 	@shared.Page("Register") {
-		<body>
+		<main>
 			<h1>Register</h1>
 			if len(errorMessage) > 0 {
 				<p style="color: red;">{ errorMessage[0] }</p>
 			}
-			<form method="post" action="/register">
+			<form hx-post="/register" hx-target="body">
 				<label for="username">Username:</label>
-				<br/>
-				<input type="text" id="username" name="username"/>
-				<br/>
-				<br/>
+				<input type="text" id="username" name="username" required/>
 				<label for="password">Password:</label>
-				<br/>
-				<input type="password" id="password" name="password"/>
-				<br/>
-				<br/>
+				<input type="password" id="password" name="password" required/>
 				<input type="submit" value="Submit"/>
 			</form>
-			<a href="/login">Login</a>
-		</body>
+			<a href="#" hx-get="/login" hx-target="body">Login</a>
+		</main>
 	}
 }

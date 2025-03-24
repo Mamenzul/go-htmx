@@ -43,7 +43,7 @@ func Register(errorMessage ...string) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<body><h1>Register</h1>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<main><h1>Register</h1>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -66,7 +66,7 @@ func Register(errorMessage ...string) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form method=\"post\" action=\"/register\"><label for=\"username\">Username:</label><br><input type=\"text\" id=\"username\" name=\"username\"><br><br><label for=\"password\">Password:</label><br><input type=\"password\" id=\"password\" name=\"password\"><br><br><input type=\"submit\" value=\"Submit\"></form><a href=\"/login\">Login</a></body>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form hx-post=\"/register\" hx-target=\"body\"><label for=\"username\">Username:</label> <input type=\"text\" id=\"username\" name=\"username\" required> <label for=\"password\">Password:</label> <input type=\"password\" id=\"password\" name=\"password\" required> <input type=\"submit\" value=\"Submit\"></form><a href=\"#\" hx-get=\"/login\" hx-target=\"body\">Login</a></main>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
